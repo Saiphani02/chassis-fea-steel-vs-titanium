@@ -1,0 +1,152 @@
+{
+ "Diagonal lift 1g": {
+  "Von Mises crossmembers": {
+   "unit": "MPa", 
+   "max_on": "LadderFrame|Surface[83]", 
+   "max_face_centroid": [
+    4170.0, 
+    0.0, 
+    40.0
+   ], 
+   "max": 766.07525736178866, 
+   "min": 17.293786499070318
+  }, 
+  "Von Mises rails": {
+   "unit": "MPa", 
+   "max_on": "LadderFrame|Surface[4]", 
+   "max_face_centroid": [
+    265.0, 
+    -400.0, 
+    0.0
+   ], 
+   "max": 1027.8054922939457, 
+   "min": 0.097094813878827971
+  }, 
+  "messages": [], 
+  "Reaction Mount RL": 13043.823172330169, 
+  "Reaction Mount RR": 3801.3748138464002, 
+  "Reaction Mount FR": 9242.4479513008137, 
+  "Von Mises": {
+   "unit": "MPa", 
+   "max_on": "LadderFrame|Surface[4]", 
+   "max_face_centroid": [
+    265.0, 
+    -400.0, 
+    0.0
+   ], 
+   "max": 1027.8054922939457, 
+   "min": 0.097094813878827971
+  }, 
+  "Total deformation": {
+   "unit": "mm", 
+   "max_on": "LadderFrame|Surface[35]", 
+   "max_face_centroid": [
+    250.0, 
+    430.0, 
+    -75.0
+   ], 
+   "max": 93.92574843682614, 
+   "min": 0.02642452240818027
+  }, 
+  "Vertical deflection": {
+   "unit": "mm", 
+   "max_on": "LadderFrame|Surface[64]", 
+   "max_face_centroid": [
+    3859.7, 
+    400.0, 
+    -0.0
+   ], 
+   "max": 21.578384399414063, 
+   "min": -93.192100524902344
+  }, 
+  "status": "Done"
+ }, 
+ "buckling_mode1_max_on": "LadderFrame|Surface[52]", 
+ "tag": "ti_t3", 
+ "t_cross": 2.5, 
+ "mesh_connection_states": [
+  [
+   "Mesh Connection", 
+   "NotSolved"
+  ], 
+  [
+   "Mesh Connection 2", 
+   "NotSolved"
+  ], 
+  [
+   "Mesh Connection 3", 
+   "NotSolved"
+  ]
+ ], 
+ "t_rail": 3.0, 
+ "elements": 21323, 
+ "mass_kg": 59.291119999999935, 
+ "buckling": true, 
+ "Bump 2.5g": {
+  "Von Mises crossmembers": {
+   "unit": "MPa", 
+   "max_on": "LadderFrame|Surface[76]", 
+   "max_face_centroid": [
+    2100.0, 
+    0.0, 
+    -40.0
+   ], 
+   "max": 86.244113773660573, 
+   "min": 0.008469904557180526
+  }, 
+  "Von Mises rails": {
+   "unit": "MPa", 
+   "max_on": "LadderFrame|Surface[26]", 
+   "max_face_centroid": [
+    3500.0, 
+    -430.0, 
+    -75.0
+   ], 
+   "max": 601.59876272345548, 
+   "min": 0.023216570728643148
+  }, 
+  "messages": [], 
+  "Reaction Mount RL": 21056.500284627506, 
+  "Reaction Mount RR": 21056.494597347271, 
+  "Reaction Mount FL": 11553.057098037127, 
+  "Reaction Mount FR": 11553.062779547734, 
+  "Von Mises": {
+   "unit": "MPa", 
+   "max_on": "LadderFrame|Surface[26]", 
+   "max_face_centroid": [
+    3500.0, 
+    -430.0, 
+    -75.0
+   ], 
+   "max": 601.59876272345548, 
+   "min": 0.008469904557180526
+  }, 
+  "Total deformation": {
+   "unit": "mm", 
+   "max_on": "LadderFrame|Surface[14]", 
+   "max_face_centroid": [
+    1575.0, 
+    -430.0, 
+    75.0
+   ], 
+   "max": 13.261516650827211, 
+   "min": 0.018774416978369762
+  }, 
+  "Vertical deflection": {
+   "unit": "mm", 
+   "max_on": "LadderFrame|Surface[5]", 
+   "max_face_centroid": [
+    30.0, 
+    -400.0, 
+    0.0
+   ], 
+   "max": 9.792445182800293, 
+   "min": -13.228029251098633
+  }, 
+  "status": "Done"
+ }, 
+ "buckling_load_multiplier_mode1": 8.060716514398111, 
+ "material": "Ti-6Al-4V", 
+ "esize": 15.0, 
+ "nodes": 72039
+}

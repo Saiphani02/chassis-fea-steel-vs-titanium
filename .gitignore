@@ -1,0 +1,5 @@
+__pycache__/
+*.FCBak
+nodes*.txt
+vm_*.txt
+*.mechdb
