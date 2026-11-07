@@ -1,63 +1,74 @@
 # Ladder-frame chassis FEA: steel vs titanium
 
-How much weight do you actually save by building a vehicle ladder frame in Ti-6Al-4V instead of
-structural steel? I modelled a generic 4.2 m ladder frame in FreeCAD, analysed it in Ansys Mechanical
-2026 R1 (Student) as a shell model, and compared a steel baseline with three titanium versions.
+How much weight do you really save by building a vehicle ladder frame in Ti-6Al-4V instead of steel?
+I modelled a 4.2 m ladder frame in **FreeCAD**, ran it through **Ansys Mechanical 2026 R1**, and compared a
+steel frame with three titanium versions under a bump and a twisting load. I wanted a number I could defend,
+not the usual "titanium is lighter".
 
-**Main finding:** the answer depends entirely on what limits the design.
+**Short answer:** it depends on what limits the design. That surprised me more than it should have.
 
-- If strength limits it, titanium wins big. A 2 mm Ti frame matches the steel frame's safety factor at
-  **77 % less mass** (39 kg vs 174 kg).
-- If stiffness limits it, titanium saves almost nothing. Ti's Young's modulus is only 57 % of steel's, so
-  a Ti frame as stiff as the steel one needs 8.8 mm walls and weighs **172 kg**.
-- In between, the thin Ti frames bring new problems. The 2 mm frame sags 4.6 times as much on a bump,
-  twists about 8 times as much, and buckles at 2.4 times the design bump load, well before it would yield.
+- Sized for strength, titanium is a big win. A 2 mm Ti frame matches the steel frame's safety factor and
+  weighs **39 kg instead of 174 kg** (77 % lighter).
+- Sized for stiffness, it saves almost nothing. That's the part people skip. Titanium's Young's modulus is 57 % of steel's, so a frame
+  as stiff as the steel one needs 8.8 mm walls and weighs **172 kg**.
+- The thin Ti frames bring their own problems. At 2 mm the frame sags 4.6x more on a bump, twists about
+  8x more, and buckles at roughly 6 g, before the metal ever yields.
 
 ![Comparison](images/comparison.png)
 
-## The model
+## CAD model (FreeCAD)
 
-| Item | Value |
+![Drawing](images/drawing.png)
+
+`cad/ladder_frame_parametric.FCStd` is a Part Design model. I kept it parametric so the titanium variants are a spreadsheet edit, not a remodel:
+
+- Each rail is a sketched hollow section (150 x 60 mm, 5 mm wall) padded to the 4200 mm frame length.
+- The five crossmembers (80 x 60 mm, 4 mm wall) are one sketch padded symmetrically between the rails.
+- Every dimension is linked to the **Params** spreadsheet. Change the wall thickness or a crossmember
+  station there and the frame rebuilds.
+- Mass check: the solid model weighs 173.4 kg in steel; the FEA shell model gives 173.6 kg.
+
+Also in `cad/`: a STEP export of the solid frame and an A3 drawing (PDF).
+
+## FEA setup (Ansys Mechanical)
+
+`ansys_project/chassis_steel_vs_titanium.mechdb` opens in Mechanical with the full model tree.
+
+| Item | Setting |
 | --- | --- |
-| Frame | Two rails, 4200 mm long, 860 mm apart; five crossmembers |
-| Rails | Rectangular hollow section 150 x 60 mm (midline) |
-| Crossmembers | RHS 80 x 60 mm (midline) |
-| Axle mounts | 100 mm pads under each rail at x = 700 mm (front) and 3500 mm (rear); 2800 mm wheelbase |
+| Geometry | Midsurface of the frame, meshed as shells with thickness assigned per part |
+| Joints | Mesh connections join rails and crossmembers along their shared edges (welded joints) |
+| Mesh | Quadratic shell elements, 15 mm, about 72 000 nodes |
+| Axle mounts | 100 mm pads under each rail at x = 700 mm and 3500 mm (2800 mm wheelbase), remote displacements so the pads act as pins |
 | Loads on frame | Cab + powertrain 1100 kg over x = 500 to 2400 mm; payload 1500 kg over x = 2400 to 4200 mm; frame self-weight |
-| Mesh | Quadratic shell elements, 15 mm, about 72 000 nodes (inside the Student 128k limit) |
-| Joints | Surfaces joined along shared edges with a mesh connection group (welded joints) |
-
-Materials (linear elastic):
 
 | Material | E (GPa) | Poisson | Density (kg/m3) | Yield (MPa) |
 | --- | --- | --- | --- | --- |
 | Steel S355 | 200 | 0.30 | 7850 | 355 |
 | Ti-6Al-4V (annealed) | 113.8 | 0.342 | 4430 | 880 |
 
-### Load cases
+Load cases:
 
-1. **Bump, 2.5 g.** All loads and the frame's own weight multiplied by 2.5. Rear mounts are pinned and the
-   front mounts restrained vertically only. All supports are remote displacements, so rotations are free and
-   the pads don't clamp the rail.
-2. **Diagonal lift, 1 g.** The front-left wheel is off the ground, so the frame rests on three mounts and
-   twists under its normal 1 g load.
+1. **Bump, 2.5 g.** Every load and the frame's own weight times 2.5. Rear mounts pinned, front mounts held
+   vertically only.
+2. **Diagonal lift, 1 g.** Front-left wheel off the ground, so the frame sits on three mounts and twists.
+3. **Eigenvalue buckling**, pre-stressed by the bump case.
 
 ## Results
 
-| Design | Walls, rail / cross (mm) | Mass (kg) | Bump: far-field stress (MPa) | Bump SF | Diagonal: far-field stress (MPa) | Diagonal SF | Bump sag (mm) | Diagonal corner drop (mm) | Buckling load factor (bump) |
+| Design | Walls, rail / cross (mm) | Mass (kg) | Bump stress (MPa) | Bump SF | Twist stress (MPa) | Twist SF | Bump sag (mm) | Twist corner drop (mm) | Buckling factor |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Steel S355 (baseline) | 5.0 / 4.0 | 173.6 | 86.9 | 4.1 | 104.6 | 3.4 | 4.5 | 24.1 | > 50 |
-| Ti-6Al-4V, strength-matched | 2.0 / 1.6 | 39.2 | 213.4 | 4.1 | 281.3 | 3.1 | 20.7 | 188 * | **2.4** |
+| Ti-6Al-4V, same strength | 2.0 / 1.6 | 39.2 | 213.4 | 4.1 | 281.3 | 3.1 | 20.7 | 188 * | **2.4** |
 | Ti-6Al-4V, 3 mm | 3.0 / 2.5 | 59.3 | 139.2 | 6.3 | 171.1 | 5.1 | 13.2 | 93 | 8.1 |
-| Ti-6Al-4V, stiffness-matched | 8.8 / 7.0 | 172.3 | 50.3 | 17.5 | 50.9 | 17.3 | 4.5 | 18.3 | > 50 |
+| Ti-6Al-4V, same stiffness | 8.8 / 7.0 | 172.3 | 50.3 | 17.5 | 50.9 | 17.3 | 4.5 | 18.3 | > 50 |
 
-SF is yield divided by far-field von Mises stress. "Far-field" means every node more than 50 mm from a
-crossmember joint or an axle-mount pad (see `analysis/farfield.py`). The buckling load factor comes from an
-eigenvalue buckling analysis pre-stressed by the bump case; 2.4 means the 2 mm frame's rail web buckles at
+Stresses are far-field von Mises values: I take every node more than 50 mm from a joint or mount pad. SF is
+yield divided by that stress. A buckling factor of 2.4 means the 2 mm frame's rail web buckles at
 2.4 x 2.5 g, about 6 g.
 
-\* Linear analysis. A 188 mm corner drop is past the range where small-deflection results are reliable;
-read it as "very flexible", not as an exact number.
+\* Linear analysis. A 188 mm corner drop is past where small-deflection results hold, so I'd read it as
+"very flexible" rather than an exact figure.
 
 | Steel, bump 2.5 g | Steel, diagonal lift |
 | --- | --- |
@@ -65,14 +76,14 @@ read it as "very flexible", not as an exact number.
 | **Ti-6Al-4V 2 mm, bump 2.5 g (deformation)** | **Ti-6Al-4V 2 mm, diagonal lift (stress)** |
 | ![](images/ti_t2_Bump_25g_Total_deformation.jpg) | ![](images/ti_t2_Diagonal_lift_1g_Von_Mises.jpg) |
 
-### Joint hot spots
+### The joints
 
-The peak stresses sit at the crossmember-to-rail joints and at the mount pads, and they are much higher than
-the far-field values: 451 MPa in the steel frame under diagonal lift, and 1863 MPa in the 2 mm Ti frame. In a
-shell model these corners are stress singularities. Refining the mesh from 15 mm to 12 mm raised the steel
-joint peak from 451 to 500 MPa, while the far-field stress didn't move (104.6 to 104.4 MPa). So I don't use the
-peaks for the safety factor. They still matter: they say the joints need gussets or brackets. For the thin Ti
-frames that local detail work, plus weld quality in titanium, would be a large part of the real design effort.
+Peak stresses sit where the crossmembers meet the rails and at the mount pads, well above the far-field
+numbers: 451 MPa in the steel frame under diagonal lift, 1863 MPa in the 2 mm Ti frame. In a shell model
+those sharp corners are singularities. Going from a 15 mm to a 12 mm mesh pushed the steel joint peak from
+451 to 500 MPa while the far-field stress stayed put (104.6 vs 104.4 MPa), so I don't use the peaks for the
+safety factor. What they do tell me is that the joints need gussets or brackets, and for thin titanium that
+detail work, plus weld quality, would be a big part of a real design.
 
 ![Steel frame, diagonal lift: stress concentrates at the crossmember joints](images/steel_t5_Diagonal_lift_1g_Von_Mises.jpg)
 
@@ -80,58 +91,44 @@ frames that local detail work, plus weld quality in titanium, would be a large p
 
 | Check | Result |
 | --- | --- |
-| Beam theory vs FEA, steel bump stress | 83.4 MPa hand calc vs 86.9 MPa FEA (+4 %) |
-| Beam theory vs FEA, steel bump sag | 4.40 mm (1D beam FE) vs 4.54 mm (+3 %) |
-| Same comparison, Ti 2 / 3 / 8.8 mm | Stress +6 / +3 / +6 %, sag +11 / +6 / +2 % (shell model adds shear and local wall bending) |
-| Reaction sum, steel bump | 68 024 N = applied 63 765 N + 2.5 x 173.6 kg x g |
-| Reaction sum, steel diagonal lift | 27 209 N = applied 25 506 N + 173.6 kg x g |
-| Mesh 15 mm vs 12 mm (steel) | Far-field stress 86.9 vs 87.0 MPa (bump), sag 4.537 vs 4.537 mm |
-| Frame mass | FEA 173.6 kg; by hand, rails 138.5 kg + crossmembers 35.2 kg = 173.7 kg |
-
-Hand calculations are in `analysis/handcalc.py`.
+| Hand beam calc vs FEA, steel bump stress | 83.4 MPa vs 86.9 MPa (+4 %) |
+| Hand beam calc vs FEA, steel bump sag | 4.40 mm vs 4.54 mm (+3 %) |
+| Same for Ti 2 / 3 / 8.8 mm | Stress +6 / +3 / +6 %, sag +11 / +6 / +2 % (the shell model adds shear and local wall bending) |
+| Reactions, steel bump | 68 024 N = 63 765 N applied + 2.5 x 173.6 kg x g |
+| Reactions, steel diagonal lift | 27 209 N = 25 506 N applied + 173.6 kg x g |
+| Mesh 15 mm vs 12 mm | Far-field stress 86.9 vs 87.0 MPa, sag 4.537 vs 4.537 mm |
+| Frame mass | CAD 173.4 kg, FEA 173.6 kg, hand calc 173.7 kg |
 
 ## Limitations
 
-- Linear static analysis. No fatigue check, and fatigue usually governs real chassis rails, especially at welds.
-- Generic geometry and loads, not a specific vehicle. The supports are idealised pads, not spring hangers.
-- No weld modelling, gussets or brackets at the joints.
+- Linear static only. There's no fatigue check, and fatigue usually governs real chassis rails, especially at welds.
+- It's generic geometry and loads, not a specific vehicle. Supports are idealised pads, not spring hangers.
+- I haven't modelled welds, gussets or brackets at the joints.
 - Cost isn't modelled. Titanium stock and welding cost many times more than steel.
 
-## Native CAD and ANSYS files
-
-These were generated by Claude (an AI assistant) on my machine, through FreeCAD and Ansys Mechanical, as GUI-ready versions of the scripted model above.
-
-- `cad/ladder_frame_parametric.FCStd`: FreeCAD 1.1 PartDesign model. Each rail and the crossmembers are sketched sections padded to length, and every dimension is driven by the `Params` spreadsheet, so changing wall thickness or length there rebuilds the frame. Solid mass in steel: 173.4 kg, matching the shell model (173.6 kg).
-- `cad/ladder_frame_solid.step`: the solid frame for other CAD tools.
-- `cad/ladder_frame_drawing.pdf`: A3 drawing with orthographic and isometric views.
-- `ansys_project/chassis_steel_vs_titanium.mechdb`: the Mechanical 2026 R1 model with geometry, mesh connections, both load cases and the buckling analysis (steel baseline). Open it in Mechanical and solve to regenerate results.
-
-## Files
+## Repository layout
 
 ```
-freecad/build_chassis.py      FreeCAD script: midsurface geometry, exports chassis_midsurface.step
-ansys/01_import.py            Mechanical: import STEP and materials.xml
-ansys/02_mesh_connections.py  Mechanical: join the 86 surface bodies along shared edges
-ansys/03_model.py             Mechanical: named selections, loads, supports, result objects
-ansys/04_solve_variant.py     Mechanical: set material/thickness from variant.json, mesh, solve, export
-ansys/05_export_nodes.py      Mechanical: node coordinates for the far-field stress filter
-ansys/mech_run.py             Sends a script to a running Mechanical session through PyMechanical
-analysis/handcalc.py          Beam-theory checks
-analysis/farfield.py          Separates joint hot spots from far-field stress
-analysis/summarize.py         Builds results/summary.json
-analysis/make_charts.py       Draws images/comparison.png
-results/                      Raw Ansys results for each design, plus summary.json
+cad/              FreeCAD parametric model, STEP export, A3 drawing
+ansys_project/    Ansys Mechanical model (.mechdb)
+results/          Results for each design (JSON) and the summary table
+images/           Figures used in this README
+automation/       Python used to rerun the four material variants in batch, the hand calcs,
+                  the far-field stress filter and the charts
 ```
 
-To rerun, start Mechanical with gRPC enabled
-(`AnsysWBU.exe -DSApplet -AppModeMech -grpc 10000 --transport-mode wnua`), run the `ansys/` scripts in
-order with `python mech_run.py <script>`, then run `04_solve_variant.py` once per `variant.json`.
+The four designs share one model and differ only in material and wall thickness, so the variants were run
+in batch through PyMechanical. I didn't want to click through the same setup four times and risk
+four slightly different models. `automation/README.md` explains
+the scripts.
 
 ## Background
 
 During my internship at Deccan Auto (Dec 2022 to May 2023) I worked on a team project on the design and
-analysis of an armed-vehicle chassis in titanium. This repository is a fresh, independent study of the same
-question. It uses generic geometry and loads, and none of the company's design or data.
+analysis of an armed-vehicle chassis in titanium. This repository is a separate, independent study of the
+same question with generic geometry and loads; none of the company's design or data is used.
+
+Built with FreeCAD, Ansys Mechanical and Python, with help from Claude.
 
 ---
 Sai Phanidhar Ammiraju · [More projects](https://github.com/Saiphani02) · [LinkedIn](https://www.linkedin.com/in/sai-ammiraju)

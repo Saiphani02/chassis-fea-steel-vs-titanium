@@ -1,0 +1,4 @@
+automation/** linguist-documentation
+*.FCStd binary
+*.mechdb binary
+*.step -text
