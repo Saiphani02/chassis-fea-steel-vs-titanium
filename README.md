@@ -1,18 +1,15 @@
 # Ladder-frame chassis FEA: steel vs titanium
 
-How much weight do you really save by building a vehicle ladder frame in Ti-6Al-4V instead of steel?
-I modelled a 4.2 m ladder frame in **FreeCAD**, ran it through **Ansys Mechanical 2026 R1**, and compared a
-steel frame with three titanium versions under a bump and a twisting load. I wanted a number I could defend,
-not the usual "titanium is lighter".
+This study compares a 4.2 m ladder-frame chassis made from S355 steel and Ti-6Al-4V. Parametric geometry was developed in **FreeCAD**, with shell-element analyses in **Ansys Mechanical 2026 R1**. Four thickness configurations were evaluated for mass, static strength, deformation and linear eigenvalue buckling.
 
 **Short answer:** it depends on what limits the design. That surprised me more than it should have.
 
 - Sized for strength, titanium is a big win. A 2 mm Ti frame matches the steel frame's safety factor and
   weighs **39 kg instead of 174 kg** (77 % lighter).
-- Sized for stiffness, it saves almost nothing. That's the part people skip. Titanium's Young's modulus is 57 % of steel's, so a frame
+- Sized for stiffness, it saves almost nothing. Titanium's Young's modulus is 57 % of steel's, so a frame
   as stiff as the steel one needs 8.8 mm walls and weighs **172 kg**.
 - The thin Ti frames bring their own problems. At 2 mm the frame sags 4.6x more on a bump, twists about
-  8x more, and buckles at roughly 6 g, before the metal ever yields.
+  8x more, and has a reported linear buckling factor of 2.4 under the 2.5 g reference loading; this is not a nonlinear collapse prediction.
 
 ![Comparison](images/comparison.png)
 
@@ -58,14 +55,15 @@ Load cases:
 
 | Design | Walls, rail / cross (mm) | Mass (kg) | Bump stress (MPa) | Bump SF | Twist stress (MPa) | Twist SF | Bump sag (mm) | Twist corner drop (mm) | Buckling factor |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Steel S355 (baseline) | 5.0 / 4.0 | 173.6 | 86.9 | 4.1 | 104.6 | 3.4 | 4.5 | 24.1 | > 50 |
+| Steel S355 (baseline) | 5.0 / 4.0 | 173.6 | 86.9 | 4.1 | 104.6 | 3.4 | 4.5 | 24.1 | See note |
 | Ti-6Al-4V, same strength | 2.0 / 1.6 | 39.2 | 213.4 | 4.1 | 281.3 | 3.1 | 20.7 | 188 * | **2.4** |
 | Ti-6Al-4V, 3 mm | 3.0 / 2.5 | 59.3 | 139.2 | 6.3 | 171.1 | 5.1 | 13.2 | 93 | 8.1 |
-| Ti-6Al-4V, same stiffness | 8.8 / 7.0 | 172.3 | 50.3 | 17.5 | 50.9 | 17.3 | 4.5 | 18.3 | > 50 |
+| Ti-6Al-4V, same stiffness | 8.8 / 7.0 | 172.3 | 50.3 | 17.5 | 50.9 | 17.3 | 4.5 | 18.3 | See note |
 
 Stresses are far-field von Mises values: I take every node more than 50 mm from a joint or mount pad. SF is
-yield divided by that stress. A buckling factor of 2.4 means the 2 mm frame's rail web buckles at
-2.4 x 2.5 g, about 6 g.
+yield divided by that stress. For the 2 mm titanium configuration, the reported positive eigenvalue factor is 2.43 relative to the 2.5 g reference loading (approximately 6.1 g in a linearized scaling interpretation). This is a theoretical eigenvalue result, not a verified failure load.
+
+**Buckling data note:** `results/summary.json` contains factors of **-51.89** (steel) and **-77.21** (8.8 mm titanium). Negative eigenvalues can correspond to reversed loading direction or a different buckling mode; they do **not** establish positive-load buckling factors above 50. Those two cases need inspection in Mechanical before a positive-load buckling claim can be made.
 
 \* Linear analysis. A 188 mm corner drop is past where small-deflection results hold, so I'd read it as
 "very flexible" rather than an exact figure.
@@ -103,8 +101,8 @@ detail work, plus weld quality, would be a big part of a real design.
 
 - Linear static only. There's no fatigue check, and fatigue usually governs real chassis rails, especially at welds.
 - It's generic geometry and loads, not a specific vehicle. Supports are idealised pads, not spring hangers.
-- I haven't modelled welds, gussets or brackets at the joints.
-- Cost isn't modelled. Titanium stock and welding cost many times more than steel.
+- Welds, gussets and brackets at the joints are not explicitly modelled.
+- Cost is not modelled. Titanium stock and welding cost many times more than steel.
 
 ## Repository layout
 
@@ -128,7 +126,7 @@ During my internship at Deccan Auto (Dec 2022 to May 2023) I worked on a team pr
 analysis of an armed-vehicle chassis in titanium. This repository is a separate, independent study of the
 same question with generic geometry and loads; none of the company's design or data is used.
 
-Built with FreeCAD, Ansys Mechanical and Python, with help from Claude.
+Tools: FreeCAD, Ansys Mechanical 2026 R1, Python and PyMechanical.
 
 ---
 Sai Phanidhar Ammiraju · [More projects](https://github.com/Saiphani02) · [LinkedIn](https://www.linkedin.com/in/sai-ammiraju)
