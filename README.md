@@ -1,5 +1,22 @@
 # Ladder-frame chassis FEA: steel vs titanium
 
+**Engineering tools:** FreeCAD · ANSYS Mechanical 2026 R1
+
+## Models and drawings
+
+| Deliverable | File | Purpose |
+| --- | --- | --- |
+| Editable CAD model | [FreeCAD model](cad/ladder_frame_parametric.FCStd) | Parametric Part Design model and Params spreadsheet |
+| Solid geometry | [STEP model](cad/ladder_frame_solid.step) | Exchange geometry for other CAD tools |
+| Shell geometry | [Midsurface STEP](cad/chassis_midsurface.step) | Surface geometry used for the shell analysis |
+| Engineering drawing | [A3 drawing PDF](cad/ladder_frame_drawing.pdf) | View the chassis drawing without CAD software |
+| Simulation model | [ANSYS Mechanical project](ansys_project/chassis_steel_vs_titanium.mechdb) | Inspect the analysis model tree |
+| Results | [Summary data](results/summary.json) | Compare material and thickness variants |
+
+**Start here:** [Download, opening instructions, and file catalog](docs/CAD_GUIDE.md).
+
+![Chassis drawing preview](images/drawing.png)
+
 This study compares a 4.2 m ladder-frame chassis made from S355 steel and Ti-6Al-4V. Parametric geometry was developed in **FreeCAD**, with shell-element analyses in **Ansys Mechanical 2026 R1**. Four thickness configurations were evaluated for mass, static strength, deformation and linear eigenvalue buckling.
 
 **Short answer:** it depends on what limits the design. That surprised me more than it should have.
@@ -15,7 +32,6 @@ This study compares a 4.2 m ladder-frame chassis made from S355 steel and Ti-6Al
 
 ## CAD model (FreeCAD)
 
-![Drawing](images/drawing.png)
 
 `cad/ladder_frame_parametric.FCStd` is a Part Design model. I kept it parametric so the titanium variants are a spreadsheet edit, not a remodel:
 
