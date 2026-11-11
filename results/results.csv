@@ -1,0 +1,5 @@
+Design,Material,Rail wall (mm),Crossmember wall (mm),Mass (kg),Bump far-field stress (MPa),Bump SF,Bump sag (mm),Twist far-field stress (MPa),Twist SF,Twist corner drop (mm),Joint peak bump (MPa),Joint peak twist (MPa),Buckling factor
+Steel S355 (baseline),Steel S355,5.0,4.0,173.6,86.9,4.09,4.54,104.6,3.39,24.12,226.0,451.3,needs check
+Ti-6Al-4V same strength,Ti-6Al-4V,2.0,1.6,39.2,213.4,4.12,20.69,281.3,3.13,188.24,1341.6,1863.0,2.43
+Ti-6Al-4V 3 mm,Ti-6Al-4V,3.0,2.5,59.3,139.2,6.32,13.23,171.1,5.14,93.19,601.6,1027.8,8.06
+Ti-6Al-4V same stiffness,Ti-6Al-4V,8.8,7.0,172.3,50.3,17.5,4.49,50.9,17.29,18.32,74.9,179.9,needs check
